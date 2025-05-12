@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Online Video Compressor</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7ff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+        }
+        
+        /* Upload Section */
+        .upload-section {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            position: relative;
+        }
+        
+        .upload-section:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 107, 255, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .upload-text h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .upload-text p {
+            color: var(--light-text);
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #3a5bef;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        /* Compression Options */
+        .options-section {
+            margin-bottom: 30px;
+        }
+        
+        .options-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        
+        .option-group {
+            margin-bottom: 20px;
+        }
+        
+        .option-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .option-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* Features Section */
+        .features-section {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .features-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .feature-icon {
+            color: var(--success-color);
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Reduce Video Size Without Losing Quality</h1>
+            <p>Try Our Free Video Compressor! Perfect for emails, social media, or saving storage space—compress videos in just a few clicks!</p>
+        </header>
+        
+        <main class="main-content">
+            <section class="upload-section" id="dropZone">
+                <div class="upload-icon">📉</div>
+                <div class="upload-text">
+                    <h3>Drag & Drop Your Video Here</h3>
+                    <p>or click to select a file</p>
+                    <input type="file" id="fileInput" class="file-input" accept="video/*">
+                    <button class="btn" id="selectFileBtn">Select Video File</button>
+                </div>
+            </section>
+            
+            <section class="options-section">
+                <h2>Compression Settings</h2>
+                
+                <div class="option-group">
+                    <label for="quality">Compression Quality</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="100" value="70" class="slider" id="qualitySlider">
+                        <span class="slider-value" id="qualityValue">70%</span>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <label for="resolution">Output Resolution</label>
+                    <select id="resolution" class="option-control">
+                        <option value="original">Original Resolution</option>
+                        <option value="1080">1080p (Full HD)</option>
+                        <option value="720">720p (HD)</option>
+                        <option value="480">480p (SD)</option>
+                        <option value="360">360p</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label for="format">Output Format</label>
+                    <select id="format" class="option-control">
+                        <option value="mp4">MP4 (Recommended)</option>
+                        <option value="webm">WEBM</option>
+                        <option value="mov">MOV</option>
+                    </select>
+                </div>
+            </section>
+            
+            <section class="features-section">
+                <h2>Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">✔️</span>
+                        <div>
+                            <h3>Size Reduction</h3>
+                            <p>Cut file size by up to 80% with minimal quality loss</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✔️</span>
+                        <div>
+                            <h3>Full Control</h3>
+                            <p>Adjust resolution, bitrate, and format</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✔️</span>
+                        <div>
+                            <h3>No Restrictions</h3>
+                            <p>No watermarks or sign-ups required</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✔️</span>
+                        <div>
+                            <h3>Universal Access</h3>
+                            <p>Works on all devices - PC, mobile, or tablet</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div style="text-align: center;">
+                <button class="btn" id="compressBtn" disabled>Compress Video Now</button>
+                <p style="margin-top: 15px; color: var(--light-text);">Your files are processed securely in your browser</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const selectFileBtn = document.getElementById('selectFileBtn');
+        const compressBtn = document.getElementById('compressBtn');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        
+        // Update quality value display
+        qualitySlider.addEventListener('input', () => {
+            qualityValue.textContent = `${qualitySlider.value}%`;
+        });
+        
+        // File selection
+        selectFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropZone.style.borderColor = 'var(--primary-color)';
+            dropZone.style.backgroundColor = 'rgba(74, 107, 255, 0.1)';
+        }
+        
+        function unhighlight() {
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.backgroundColor = 'var(--secondary-color)';
+        }
+        
+        dropZone.addEventListener('drop', handleDrop);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length) {
+                handleFileSelect({ target: { files } });
+            }
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            
+            if (!file) return;
+            
+            if (!file.type.match('video.*')) {
+                alert('Please select a video file');
+                return;
+            }
+            
+            // Enable compress button
+            compressBtn.disabled = false;
+            
+            // Update UI to show selected file
+            const uploadText = dropZone.querySelector('.upload-text');
+            uploadText.innerHTML = `
+                <h3>${file.name}</h3>
+                <p>${formatFileSize(file.size)}</p>
+                <button class="btn btn-secondary" id="changeFileBtn">Change File</button>
+            `;
+            
+            // Add event listener to change file button
+            document.getElementById('changeFileBtn').addEventListener('click', () => {
+                fileInput.click();
+            });
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Compression button click
+        compressBtn.addEventListener('click', () => {
+            if (compressBtn.disabled) return;
+            
+            // In a real app, you would compress the video here
+            alert('Video compression would start now with these settings:\n' +
+                  `Quality: ${qualitySlider.value}%\n` +
+                  `Resolution: ${document.getElementById('resolution').value}\n` +
+                  `Format: ${document.getElementById('format').value}`);
+            
+            // This is where you would use a library like FFmpeg.js to compress the video
+        });
+    </script>
+</body>
+</html>
