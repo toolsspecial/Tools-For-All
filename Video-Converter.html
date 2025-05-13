@@ -4,238 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Converter Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest"></script>
     <style>
-        /* Base Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1E1E2F;
+            color: #EAEAEA;
+            text-align: center;
             padding: 20px;
-            color: #333;
         }
-        
-        .tool-container {
-            max-width: 1000px;
-            margin: 0 auto;
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #2B2D42;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
         }
-        
-        /* Tool Header */
-        .tool-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .tool-header h1 {
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .tool-header p {
-            font-size: 1.1rem;
-            color: #7f8c8d;
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-        
-        /* Tool Card */
-        .tool-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .tool-icon {
-            font-size: 3rem;
-            display: block;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .features-list {
-            margin: 25px 0;
-            padding-left: 20px;
-        }
-        
-        .features-list li {
-            margin-bottom: 12px;
-            list-style-type: none;
-            position: relative;
-            padding-left: 30px;
-        }
-        
-        .features-list li:before {
-            content: "✔️";
-            position: absolute;
-            left: 0;
-            color: #27ae60;
-        }
-        
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #bdc3c7;
-            border-radius: 8px;
-            padding: 40px 20px;
-            text-align: center;
-            margin: 30px 0;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .upload-area:hover {
-            border-color: #3498db;
-            background: #f8fafc;
-        }
-        
-        .upload-area i {
-            font-size: 3rem;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-        
-        .upload-area h3 {
-            margin: 0 0 10px;
-            color: #2c3e50;
-        }
-        
-        .upload-area p {
-            color: #7f8c8d;
-            margin: 0;
-        }
-        
-        /* Button Styles */
-        .action-button {
-            background: #3498db;
-            color: white;
+        .btn {
+            padding: 10px 20px;
+            background: #FFD700;
+            color: #1E1E2F;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
-            display: block;
-            width: 100%;
-            max-width: 300px;
-            margin: 20px auto;
-            text-align: center;
-            transition: background 0.3s ease;
-            text-decoration: none;
-            font-weight: 600;
+            margin-top: 10px;
+            transition: 0.3s;
         }
-        
-        .action-button:hover {
-            background: #2980b9;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .tool-header h1 {
-                font-size: 2rem;
-            }
-            
-            .tool-card {
-                padding: 20px;
-            }
+        .btn:hover {
+            background: #E6C200;
         }
     </style>
 </head>
 <body>
-    <div class="tool-container">
-        <div class="tool-header">
-            <h1>Need to Convert a Video? Try Our Free Online Video Converter!</h1>
-            <p>Quickly convert your videos between popular formats like MP4, AVI, MOV, MKV, and more with our easy-to-use online video converter. Whether you need compatibility for different devices or want to optimize for editing, our tool ensures high-quality conversions in seconds—no software installation required!</p>
-        </div>
-        
-        <div class="tool-card">
-            <div class="upload-area" id="dropArea">
-                <div class="tool-icon">🎥</div>
-                <h3>Drag & Drop Your Video Here</h3>
-                <p>or click to browse files</p>
-                <input type="file" id="fileInput" accept="video/*" style="display: none;">
-            </div>
-            
-            <h3>Key Features:</h3>
-            <ul class="features-list">
-                <li>Supports multiple formats (MP4, AVI, MOV, WEBM, etc.)</li>
-                <li>Fast conversion without quality loss</li>
-                <li>Works on any device (PC, mobile, tablet)</li>
-                <li>100% free & secure</li>
-            </ul>
-            
-            <div class="format-options" style="margin: 30px 0; text-align: center;">
-                <label for="outputFormat" style="display: block; margin-bottom: 10px; font-weight: 600;">Output Format:</label>
-                <select id="outputFormat" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 1rem; width: 100%; max-width: 300px;">
-                    <option value="mp4">MP4 (Recommended)</option>
-                    <option value="avi">AVI</option>
-                    <option value="mov">MOV</option>
-                    <option value="mkv">MKV</option>
-                    <option value="webm">WEBM</option>
-                </select>
-            </div>
-            
-            <a href="#" class="action-button">Convert Video Now</a>
-        </div>
+    <div class="container">
+        <h2>Video Converter</h2>
+        <input type="file" id="videoInput" accept="video/*">
+        <br><br>
+        <label for="formatSelect">Choose Output Format:</label>
+        <select id="formatSelect">
+            <option value="mp4">MP4</option>
+            <option value="mov">MOV</option>
+            <option value="wmv">WMV</option>
+            <option value="avi">AVI</option>
+            <option value="mkv">MKV</option>
+            <option value="flv">FLV</option>
+            <option value="webm">WEBM</option>
+        </select>
+        <br><br>
+        <button class="btn" onclick="convertVideo()">Convert</button>
+        <p id="status"></p>
+        <video id="videoPreview" controls style="display:none; width: 100%; margin-top: 10px;"></video>
+        <a id="downloadLink" style="display:none;" class="btn" download>Download Converted Video</a>
     </div>
 
     <script>
-        // Basic file input functionality
-        const dropArea = document.getElementById('dropArea');
-        const fileInput = document.getElementById('fileInput');
-        
-        dropArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFiles(e.target.files);
-            }
-        });
-        
-        // Handle drag and drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, unhighlight, false);
-        });
-        
-        function highlight() {
-            dropArea.style.borderColor = '#3498db';
-            dropArea.style.backgroundColor = '#f0f8ff';
-        }
-        
-        function unhighlight() {
-            dropArea.style.borderColor = '#bdc3c7';
-            dropArea.style.backgroundColor = 'transparent';
-        }
-        
-        dropArea.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
+        async function convertVideo() {
+            const { createFFmpeg, fetchFile } = FFmpeg;
+            const ffmpeg = createFFmpeg({ log: true });
             
-            if (files.length) {
-                handleFiles(files);
+            const inputVideo = document.getElementById('videoInput').files[0];
+            const outputFormat = document.getElementById('formatSelect').value;
+            const statusText = document.getElementById('status');
+            const downloadLink = document.getElementById('downloadLink');
+            const videoPreview = document.getElementById('videoPreview');
+            
+            if (!inputVideo) {
+                alert("Please upload a video file.");
+                return;
             }
-        });
-        
-        function handleFiles(files) {
-            // Here you would handle the file upload
-            console.log('File selected:', files[0].name);
-            // In a real app, you would upload and process the file here
+            
+            statusText.innerText = "Processing video...";
+            await ffmpeg.load();
+            
+            const inputFileName = 'input.' + inputVideo.name.split('.').pop();
+            const outputFileName = `output.${outputFormat}`;
+            
+            ffmpeg.FS('writeFile', inputFileName, await fetchFile(inputVideo));
+            await ffmpeg.run('-i', inputFileName, outputFileName);
+            
+            const data = ffmpeg.FS('readFile', outputFileName);
+            const videoBlob = new Blob([data.buffer], { type: `video/${outputFormat}` });
+            const videoUrl = URL.createObjectURL(videoBlob);
+            
+            downloadLink.href = videoUrl;
+            downloadLink.style.display = 'block';
+            downloadLink.innerText = 'Download Converted Video';
+            
+            videoPreview.src = videoUrl;
+            videoPreview.style.display = 'block';
+            
+            statusText.innerText = "Conversion Completed!";
         }
     </script>
 </body>
 </html>
+
+  
