@@ -1,132 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Video Converter Tool</title>
+  <meta charset="UTF-8">
+  <title>FFmpeg.wasm Video Converter</title>
   <style>
+    /* Dark theme styling */
     body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
+      background: #1E1E2F;
+      color: #ECECEC;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 1rem;
     }
-    .container {
-      background-color: #1e1e1e;
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+    .converter {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #252A3C;
+      border-radius: 8px;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    h2 { color: #fff; }
+    label, select, button { display: block; width: 100%; margin: 0.5rem 0; }
     input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
+      padding: 0.5rem;
+      background: #363A46;
+      color: #ECECEC;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 4px;
+      font-size: 1rem;
     }
-    button {
-      background-color: #00bcd4;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0097a7;
-    }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
     video {
       width: 100%;
-      margin-top: 15px;
-      display: none;
+      margin-top: 1rem;
+      background: #000;
+      border: 1px solid #444;
+    }
+    #status {
+      margin: 0.5rem 0;
+      min-height: 1.2em;
     }
     a#downloadLink {
       display: none;
-      color: #00e5ff;
-      margin-top: 12px;
-      text-align: center;
-      display: block;
-    }
-    #status {
-      margin-top: 15px;
-      font-size: 14px;
-      text-align: center;
+      margin-top: 0.5rem;
+      color: #4A90E2;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Video Converter Tool</h2>
-    <input type="file" id="videoInput" accept="video/*" />
-    <select id="formatSelect">
-      <option value="mp4">MP4</option>
-      <option value="webm">WEBM</option>
-      <option value="ogg">OGG</option>
+  <div class="converter">
+    <h2>Video Converter</h2>
+    <label for="uploader">Choose a video file:</label>
+    <input type="file" id="uploader" accept="video/*">
+    <label for="format">Output format:</label>
+    <select id="format">
+      <option value="mp4">MP4 (H.264)</option>
+      <option value="webm">WEBM (VP9)</option>
+      <option value="ogg">OGG (Theora)</option>
     </select>
-    <button onclick="convertVideo()">Convert Video</button>
-    <div id="status"></div>
-    <video id="preview" controls></video>
+    <button id="convertBtn" disabled>Convert</button>
+    <p id="status">Select a file to convert.</p>
+    <video id="video-preview" controls></video>
     <a id="downloadLink">Download Converted Video</a>
   </div>
 
-  <!-- FFmpeg.wasm script (module-based) -->
-  <script type="module">
-    import { createFFmpeg, fetchFile } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js';
+  <!-- Include FFmpeg.wasm via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg.wasm/main/dist/index.global.js"></script>
+  <script>
+    const { createFFmpeg, fetchFile } = FFmpeg;  // FFmpeg is global from the script
+    const ffmpeg = createFFmpeg({
+      log: true,
+      // Optional: track progress (ratio = completed fraction)
+      progress: ({ ratio }) => {
+        status.textContent = `Converting: ${(ratio * 100).toFixed(1)}%`;
+      }
+    });
 
-    const ffmpeg = createFFmpeg({ log: true });
-    const videoInput = document.getElementById('videoInput');
-    const formatSelect = document.getElementById('formatSelect');
-    const preview = document.getElementById('preview');
-    const downloadLink = document.getElementById('downloadLink');
+    const uploader = document.getElementById('uploader');
+    const format = document.getElementById('format');
+    const convertBtn = document.getElementById('convertBtn');
     const status = document.getElementById('status');
+    const videoPreview = document.getElementById('video-preview');
+    const downloadLink = document.getElementById('downloadLink');
 
-    async function convertVideo() {
-      const file = videoInput.files[0];
-      if (!file) {
-        status.textContent = 'Please upload a video file.';
-        return;
+    let selectedFile = null;
+    uploader.addEventListener('change', (e) => {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        status.textContent = `File ready: ${selectedFile.name}`;
+        convertBtn.disabled = false;
       }
+    });
 
-      const format = formatSelect.value;
-      const inputName = 'input.' + file.name.split('.').pop();
-      const outputName = 'output.' + format;
+    convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+      convertBtn.disabled = true;
+      status.textContent = 'Loading FFmpeg engine (this may take a few seconds)…';
+      // Load FFmpeg core (lazily, not on initial page load):contentReference[oaicite:3]{index=3}
+      await ffmpeg.load();
 
-      status.textContent = 'Loading FFmpeg...';
-      if (!ffmpeg.isLoaded()) await ffmpeg.load();
+      const { name } = selectedFile;
+      const outExt = format.value;
+      const outName = `output.${outExt}`;
 
-      try {
-        status.textContent = 'Converting... This may take some time.';
-        ffmpeg.FS('writeFile', inputName, await fetchFile(file));
+      status.textContent = 'Writing input file…';
+      ffmpeg.FS('writeFile', name, await fetchFile(selectedFile));  // writeFile from input:contentReference[oaicite:4]{index=4}
 
-        await ffmpeg.run('-i', inputName, outputName);
+      status.textContent = 'Converting…';
+      // Run FFmpeg command: input -> output format
+      await ffmpeg.run('-i', name, outName);  // conversion step:contentReference[oaicite:5]{index=5}
 
-        const data = ffmpeg.FS('readFile', outputName);
-        const videoBlob = new Blob([data.buffer], { type: 'video/' + format });
-        const videoUrl = URL.createObjectURL(videoBlob);
+      status.textContent = 'Reading output…';
+      // Read result and create a Blob URL for preview/download
+      const data = ffmpeg.FS('readFile', outName);
+      const videoBlob = new Blob([data.buffer], { type: `video/${outExt}` });
+      const videoURL = URL.createObjectURL(videoBlob);
 
-        // Show preview
-        preview.src = videoUrl;
-        preview.style.display = 'block';
+      // Show preview and download link
+      videoPreview.src = videoURL;
+      downloadLink.href = videoURL;
+      downloadLink.download = `converted.${outExt}`;
+      downloadLink.textContent = `Download .${outExt.toUpperCase()} Video`;
+      downloadLink.style.display = 'block';
 
-        // Download link
-        downloadLink.href = videoUrl;
-        downloadLink.download = outputName;
-        downloadLink.style.display = 'block';
-        downloadLink.textContent = 'Download ' + outputName;
-
-        status.textContent = 'Conversion complete!';
-      } catch (error) {
-        console.error(error);
-        status.textContent = 'An error occurred during conversion.';
-      }
-    }
+      status.textContent = 'Conversion complete!';
+      // Clean up (optional)
+      ffmpeg.FS('unlink', name);
+      ffmpeg.FS('unlink', outName);
+    });
   </script>
 </body>
 </html>
